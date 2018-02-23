@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 """
 @begin parameter_search @desc Workflow for using ranking function to score the parameter
 @param s @desc the parameter s of the ranking function PivotedLength
-@in config.toml file @desc metapy configuration file to do text mining
+@in config_file @uri file:config.toml @desc metapy configuration file to do text mining
 @out score @desc the final score for ranking function
 @out avg_p @desc average precision for every query
 @out test.png @uri file: test.png 
@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 def parameter_search(s):
     """
     @begin metapy_run @desc Create metapy idx and queries and using IREval from config files
-    @in  config_file @uri file: config.toml
+    @in  config_file @as config_file
     @out idx @desc make inverted index
     @out query @desc build the query object
     @out ev   @desc to do an IR evaluation
