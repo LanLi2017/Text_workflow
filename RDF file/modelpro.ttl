@@ -1,0 +1,223 @@
+BASE         <http://yesworkflow.org/0000000000/>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX prov: <http://www.w3c.org/ns/prov#>
+PREFIX p1:   <http://dataone.org/ns/provone#>
+PREFIX yw:   <http://yesworkflow.org/ns/yesworkflow>
+
+## Source Script: test.py
+
+##### Class Equality ####
+yw:Block        rdf:type           rdfs:Class ;
+                owl:sameAs         p1:Program .
+
+yw:Workflow     rdf:type             rdfs:Class ;
+	            rdfs:subClassOf      yw:Block ;
+                owl:sameAs           p1:Workflow .
+
+yw:InPort       rdf:type             rdfs:Class ;
+	            rdfs:subClassOf      yw:Port .
+
+yw:OutPort      rdf:type             rdfs:Class ;
+	            rdfs:subClassOf      yw:Port .
+
+yw:ParamPort    rdf:type             rdfs:Class ;
+	            rdfs:subClassOf      yw:InPort .
+
+yw:Port         rdf:type             rdfs:Class ;
+                owl:sameAs           p1:Port .
+
+yw:Data         rdf:type             rdfs:Class .
+
+yw:Resource     rdf:type             rdfs:Class .
+
+yw:URIVariable  rdf:type             rdfs:Class .
+
+### Property Equality ###
+
+yw:hasSubBlock      owl:sameAs       p1:hasSubProgram .
+
+yw:hasInPort        owl:sameAs       p1:hasInPort .
+
+yw:hasOutPort       owl:sameAs       p1:hasOutPort .
+
+#### Data #####
+<parameter_search#s_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "s" ;
+    rdfs:comment    "the parameter s of the ranking function PivotedLength" .
+
+<parameter_search#config_toml_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "config.toml" ;
+    rdfs:comment    "metapy configuration file to do text mining" .
+
+
+<parameter_search#num_results_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "num_results" ;
+    rdfs:comment    "loop over the queries file and add each result to the IREval object ev" .
+
+<parameter_search#idx_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "idx" ;
+    rdfs:comment    "make inverted index" .
+
+<parameter_search#query_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "query" ;
+    rdfs:comment    "build the query object".
+
+<parameter_search#ev_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "ev" ;
+    rdfs:comment    "to do an IR evaluation"
+
+<parameter_search#score_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "score" ;
+    rdfs:comment    "the final score for ranking function" .
+
+<parameter_search#avg_p_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "avg_p" ;
+    rdfs:comment    "average precision for every query" .
+
+<parameter_search#test.png_data>
+    rdf:type        yw:Data ;
+    rdfs:label      "test.png" ;
+    rdfs:comment    "file: test.png" .
+
+############################
+#    parameter_search      #
+############################
+<parameter_search>
+    rdf:type         yw:Workflow;
+    rdfs:label       "parameter_search" ;
+    rdfs:comment     "Workflow for using ranking function to score the parameter" ;
+    yw:sourceScript  "test.py" ;
+    yw:hasInPort     <parameter_search#s_port> ,
+    yw:hasOutPort    <parameter_search#score_port> ,
+                     <parameter_search#avg_p_port> ,
+                     <parameter_search#test.png_port>;
+    yw:hasSubBlock   <parameter_search/metapy_run> ,
+                     <parameter_search/score_calculate> .
+
+#### Port ###
+<parameter_search#s_port>
+    rdf:type          yw:ParamPort ;
+    rdfs:label        "s" ;
+    yw: receives      <parameter_search#s_data> .
+
+<parameter_search#score_port>
+    rdf:type          yw:OutPort ;
+    rdfs:label        "score" ;
+    yw:sends          <parameter_search#score_data> .
+
+<parameter_search#avg_p_port>
+    rdf:type          yw:OutPort ;
+    rdfs:label        "avg_p" ;
+    yw:sends          <parameter_search#avg_p> .
+
+<parameter_search#test.png_port>
+    rdf:type          yw:Outport ;
+    rdfs:label        "test.png" ;
+    yw:sends          <parameter_search#test.png_data> .
+
+#####################
+# parameter_search  #
+#     metapy_run    #
+#####################
+<parameter_search/metapy_run>
+    rdf:type           yw:Block ;
+    rdfs:label         "metapy_run" ;
+    rdfs:comment       "Create metapy idx and queries and using IREval from config files" ;
+    yw:hasInport       <parameter_search/metapy_run#config_file_port> ;
+    yw:hasOutport      <parameter_search/metapy_run#query_port> ,
+                       <parameter_search/metapy_run#idx_port> ,
+                       <parameter_search/metapy_run#ev_port> ;
+
+#### Port ###
+<parameter_search/metapy_run#config_file_port>
+    rdf:type           yw:InPort ；
+    rdfs:label         "config_file" ;
+    yw:receives        <parameter_search#config_file_data> .
+
+<parameter_search/metapy_run#query_port>
+    rdf:type           yw:OutPort ;
+    rdfs:label         "query" ;
+    yw:sends           <parameter_search#query_data> .
+
+<parameter_search/metapy_run#idx_port>
+    rdf:type           yw:OutPort ;
+    rdfs:label         "idx" ;
+    yw:sends           <parameter_search#idx_data> .
+
+<parameter_search/metapy_run#ev_port>
+    rdf:type           yw:OutPort ;
+    rdfs:label         "ev" ;
+    yw:sends           <parameter_search#ev_data> .
+
+
+########################
+#  parameter_search    #
+#      score_calculate #
+########################
+<parameter_search/score_calculate>
+    rdf:type            yw:Block ;
+    rdfs:label          "score_calculate" ;
+    rdfs:comment        "calculate scores for queries and plot"
+    yw:hasInPort        <parameter_search/score_calculate#s_port> ,
+                        <parameter_search/score_calculate#query_port> ,
+                        <parameter_search/score_calculate#idx_port> ,
+                        <parameter_search/score_calculate#ev_port> ,
+                        <parameter_search/score_calculate#num_results_port> ;
+    yw:hasOutPort       <parameter_search/score_calculate#score_port> ,
+                        <parameter_search/score_calculate#avg_p_port> ,
+                        <parameter_search/score_calculate#test.png_port> .
+
+##### Port ###
+<parameter_search/score_calculate#s_port>
+    rdf:type            yw:ParamPort ;
+    rdfs:label          "s" ;
+    yw:receives         <parameter_search#s_data> .
+
+<parameter_search/score_calculate#num_results_port>
+    rdf:type            yw:ParamPort ;
+    rdfs:label          "num_results" ;
+    yw:receives         <parameter_search#num_results_data> .
+
+<parameter_search/score_calculate#query_port>
+    rdf:type            yw:InPort ;
+    rdfs:label          "query" ;
+    yw:receives         <parameter_search#query_data> .
+
+<parameter_search/score_calculate#idx_port>
+    rdf:type            yw:InPort ;
+    rdfs:label          "idx" ;
+    yw:receives         <parameter_search#idx_data> .
+
+<parameter_search/score_calculate#ev_port>
+    rdf:type            yw:InPort ;
+    rdfs:label          "ev" ;
+    yw:receives         <parameter_search#ev_data> .
+
+<parameter_search/score_calculate#score_port>
+    rdf:type            yw:OutPort ;
+    rdfs:label          "score" ;
+    yw:sends            <parameter_search#score_data> .
+
+<parameter_search/score_calculate#avg_p_port>
+    rdf:type            yw:OutPort ;
+    rdfs:label          "avg_p" ;
+    yw:sends            <parameter_search#avg_p_data> .
+
+<parameter_search/score_calculate#test.png_port>
+    rdf:type            yw:OutPort ;
+    rdfs:label          "test.png" ;
+    yw:sends            <parameter_search#test.png_data> .
+
+
+                    
+
