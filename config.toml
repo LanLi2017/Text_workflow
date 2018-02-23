@@ -1,12 +1,24 @@
+#@begin config_toml @desc text mining procedure
+#@out out_put_file @desc output file
+
+#@begin stop_words @desc using stop words to clean
+#@out  out_file @desc  common words
 prefix = "."
 stop-words = "lemur-stopwords.txt"
+#@end stop_words
 
+#@begin dataset @desc using traning set
+#@out index @desc idx
 dataset = "cranfield"
 corpus = "line.toml"
 index = "idx"
 
 query-judgements = "cranfield-qrels.txt"
+#@end dataset
 
+
+#@begin analyzers @desc using analyzers to do ngram filter
+#@out out_file1 @desc file after doing ngram
 [[analyzers]]
 method = "ngram-word"
 ngram = 1
@@ -15,3 +27,6 @@ filter = "default-unigram-chain"
 [query-runner]
 query-path = "cranfield-queries.txt"
 query-id-start = 1
+#@end analyzers
+
+#@end config_toml
